@@ -13,7 +13,7 @@
 //   title    one line
 //   body     optional second line
 //   time     optional ms timestamp; newest sorts first within a section
-//   open()   what Enter or a click does; the inbox closes itself afterwards
+//   open()   what Enter or a click does; the inbox closes itself first
 
 import agents from "./agents.js";
 

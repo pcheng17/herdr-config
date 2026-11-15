@@ -24,12 +24,18 @@ function since(ms) {
 }
 
 // One broken source shows as a row instead of blanking the inbox.
+function errorItem(source, message) {
+  return { key: `error-${source.id}`, section: "now", badge: "ERROR", tone: "blocked",
+    title: `${source.id} source failed`, body: message, time: null, open: () => {} };
+}
+
 function sourceItems(source) {
   try {
-    return source.items();
+    const items = source.items();
+    if (!Array.isArray(items)) return [errorItem(source, "items() must return an array")];
+    return items;
   } catch (err) {
-    return [{ key: `error-${source.id}`, section: "now", badge: "ERROR", tone: "blocked",
-      title: `${source.id} source failed`, body: String(err?.message ?? err), time: null, open: () => {} }];
+    return [errorItem(source, String(err?.message ?? err))];
   }
 }
 
@@ -45,6 +51,7 @@ function grouped() {
 export default class Inbox extends View {
   init(_props, cx) {
     this.at = 0;
+    this.selectedKey = null;
     this.scroll = ScrollHandle.new();
     this.handle = cx.focus_handle();
     this.handle.focus();
@@ -68,6 +75,7 @@ export default class Inbox extends View {
     else if (UP.includes(k)) this.at = Math.max(this.at - 1, 0);
     else if (k === "enter") return this.open(flat[this.at]);
     else return;
+    this.selectedKey = flat[this.at]?.key ?? null;
     cx.stop_propagation();
     cx.notify();
   }
@@ -76,8 +84,11 @@ export default class Inbox extends View {
     const t = theme();
     const sections = grouped();
     const flat = sections.flatMap((s) => s.items);
-    this.at = Math.max(0, Math.min(this.at, flat.length - 1));
+    // Follow the selected item when rows above it come or go; else keep the position.
+    const kept = flat.findIndex((i) => i.key === this.selectedKey);
+    this.at = kept >= 0 ? kept : Math.max(0, Math.min(this.at, flat.length - 1));
     const selected = flat[this.at];
+    this.selectedKey = selected?.key ?? null;
 
     const heading = (s) => div().px(14).pt(10).pb(4).text_size(11).font_medium().text_color(t.dim)
       .child(`${s.label} · ${s.items.length}`);
