@@ -19,6 +19,14 @@ log_info() { printf "\033[34m[INFO]\033[0m %s\n" "$1"; }
 log_warn() { printf "\033[33m[WARN]\033[0m %s\n" "$1"; }
 log_error() { printf "\033[31m[ERROR]\033[0m %s\n" "$1" >&2; }
 
+# A path for messages: $HOME shown as ~. The links themselves use full paths.
+pretty() {
+  case "$1" in
+    "$HOME"/*) printf '~/%s' "${1#"$HOME"/}" ;;
+    *) printf '%s' "$1" ;;
+  esac
+}
+
 link() {
   local target=$1 link=$2
   mkdir -p "$(dirname "$link")"
@@ -29,16 +37,16 @@ link() {
     mkdir -p "$(dirname "$backup")"
     mv -n "$link" "$backup"
     if [ -e "$link" ]; then
-      log_error "Could not move aside, not linked: $link"
+      log_error "Could not move aside, not linked: $(pretty "$link")"
       return 1
     fi
-    log_warn "Moved aside $link -> $backup"
+    log_warn "Moved aside $(pretty "$link") -> $(pretty "$backup")"
   fi
   ln -s "$target" "$link"
-  log_ok "Symlink $link -> $target"
+  log_ok "Symlink $(pretty "$link") -> $(pretty "$target")"
 }
 
-log_info "Symlinking Herdr app configs into $APP_HOME..."
+log_info "Symlinking Herdr app configs into $(pretty "$APP_HOME")..."
 
 for file in keys.json settings.json; do
   link "$REPO/$file" "$APP_HOME/$file"
