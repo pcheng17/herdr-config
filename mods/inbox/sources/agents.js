@@ -16,8 +16,9 @@ const KINDS = {
 // It's never "done": it reports to its parent, and the parent's done is the news.
 const SUB_BLOCKED = new Set(["blocked", "error"]);
 
-// { [address]: snippet } for agents blocked now; "" while a read is under way
-// or when the screen had nothing to show.
+// { [address]: { text, since } } for agents blocked now: what the screen asks
+// ("" while a read is under way or when it had nothing to show), and when the
+// inbox first saw it blocked (sub-agents report no time of their own).
 const PROMPTS = "inbox.prompts";
 // "Blocked" can be reported before the agent has drawn its prompt, so a read
 // waits a moment and tries again while the screen shows nothing to extract.
@@ -59,7 +60,7 @@ async function readPrompt(cx, address) {
     }
   }
   const now = shared(PROMPTS) ?? {};
-  if (address in now) setShared(PROMPTS, { ...now, [address]: snippet });
+  if (address in now) setShared(PROMPTS, { ...now, [address]: { ...now[address], text: snippet } });
 }
 
 // Reads each blocked agent's screen once per blocked spell; forgets agents
@@ -74,7 +75,8 @@ function sync(cx) {
   const kept = Object.fromEntries(Object.entries(stored).filter(([a]) => blocked.has(a)));
   const fresh = [...blocked].filter((a) => !(a in kept));
   if (fresh.length === 0 && Object.keys(kept).length === Object.keys(stored).length) return;
-  setShared(PROMPTS, { ...kept, ...Object.fromEntries(fresh.map((a) => [a, ""])) });
+  const since = Date.now();
+  setShared(PROMPTS, { ...kept, ...Object.fromEntries(fresh.map((a) => [a, { text: "", since }])) });
   for (const address of fresh) cx.spawn((cx) => readPrompt(cx, address));
 }
 
@@ -83,7 +85,7 @@ function agentItem(a, prompts, changedAt) {
     ...KINDS[a.status],
     key: `agent-${a.address}`,
     title: `${a.space_name} · ${a.tab_name}`,
-    body: prompts[a.address] || a.title || a.program?.name || "",
+    body: prompts[a.address]?.text || a.title || a.program?.name || "",
     time: changedAt.get(a.tab) ?? null,
     open: () => run("agent.focus", { terminal: a.address }),
   };
@@ -95,9 +97,10 @@ function subAgentItem({ t, root }, prompts) {
     ...KINDS.blocked,
     key: `agent-${t.address}`,
     title: root ? `${root.space_name} · ${root.tab_name} › ${name}` : name,
-    body: prompts[t.address] || t.title || t.program?.name || "",
-    time: t.status_ms ?? null,
-    open: () => run("agent.focus", { terminal: t.address }),
+    body: prompts[t.address]?.text || t.title || t.program?.name || "",
+    time: prompts[t.address]?.since ?? null,
+    // No pane to focus: open it over the tab, as Herdr's sidebar does.
+    open: () => run("terminal.peek", { terminal: t.address }),
   };
 }
 
