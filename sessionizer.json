@@ -3,5 +3,11 @@
     "~/dev",
     "~/Workspace"
   ],
-  "folders": ["~/.dotfiles", "~/.ssh"]
+  "folders": ["~/.dotfiles", "~/.ssh"],
+  "machines": {
+    "worker": {
+      "roots": ["~/dev"],
+      "folders": ["~/.dotfiles"]
+    }
+  }
 }
