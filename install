@@ -66,3 +66,11 @@ for mod in "$REPO"/mods/*/; do
   mod="${mod%/}"
   link "$mod" "$APP_HOME/mods/$(basename "$mod")"
 done
+
+# macOS font smoothing draws text heavier than other terminals do; turn it off
+# for Herdr only. Read at launch, so restart Herdr after the first install.
+if [ "$(uname -s)" = Darwin ]; then
+  log_info "Turning off macOS font smoothing for Herdr..."
+  defaults write dev.herdr.app AppleFontSmoothing -int 0
+  log_ok "Set dev.herdr.app AppleFontSmoothing = 0"
+fi
