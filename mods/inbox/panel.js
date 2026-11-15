@@ -1,5 +1,5 @@
 // Inbox side panel: what needs you, from every source in ./sources, with a
-// filter chip per source. Lives in the main-inbox layout's panel stack and is
+// filter chip per source. Lives in the pcheng layout's panel stack and is
 // toggled by the tab bar's Inbox button (./tabs.js). Click a row to go there.
 
 import { div } from "gpui-kit";

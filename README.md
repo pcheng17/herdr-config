@@ -11,14 +11,14 @@ git clone <this repo> ~/.herdr-config
 
 `install` symlinks into `~/.config/herdr-app` (or `$HERDR_APP_HOME`). Rerun it
 after adding a theme, layout or mod. Then pick the layout with
-`herdr-app do layout.switch '{"name":"main-inbox"}'` (or cmd-shift-l).
+`herdr-app do layout.switch '{"name":"pcheng"}'` (or cmd-shift-l).
 
 | Path | What |
 |---|---|
 | `keys.json`, `settings.json` | Key bindings and app settings |
 | `sessionizer.json` | Where the sessionizer looks: `roots` (each one's subfolders) and fixed `folders`, plus the same per remote machine under `machines` (named as in `hc machine ls`) |
 | `themes/` | Catppuccin mocha and latte |
-| `layouts/main-inbox.json` | Herdr's `main` layout plus the Inbox panel and tab bar button |
+| `layouts/pcheng.json` | Herdr's `main` layout plus the Inbox panel and tab bar button |
 | `mods/inbox` | Inbox of agents that need you (blocked or finished), with a sources seam for more connections |
 | `mods/leader` | tmux-style ctrl-space prefix popup |
 | `mods/sessionizer` | ctrl-space ctrl-f: tmux-sessionizer, fuzzy-pick a folder and open (or switch to) its space |
