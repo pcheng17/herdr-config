@@ -18,6 +18,7 @@
     "cmd-p": "mod.open:picker",
     "cmd-i": "mod.open:inbox",
     "cmd-shift-p": "app.palette",
+    "cmd-e": "mod.open:nvim-tab",
     "cmd-,": "app.settings",
     "cmd-d": "pane.split:right",
     "cmd-shift-d": "pane.split:down",
