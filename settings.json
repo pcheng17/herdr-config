@@ -1,14 +1,15 @@
 {
-  "zoom": 1.0,
+  "zoom": 1,
   "sounds": {
     "enabled": false
   },
   "font": "JetBrainsMonoNL Nerd Font Mono",
-  "font_size": 14.0,
+  "font_size": 14,
   "font_ligatures": false,
   "telemetry": false,
   "pane_scrollbars": false,
-  "minimum_contrast": 1.0,
+  "minimum_contrast": 1,
+  "theme": "catppuccin-mocha",
   "appearance": "dark",
-  "theme": "catppuccin-mocha"
+  "terminal_line_height": 1.1
 }
