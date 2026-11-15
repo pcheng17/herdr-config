@@ -3,7 +3,7 @@
     "~/dev",
     "~/Workspace"
   ],
-  "folders": ["~/.dotfiles", "~/.ssh"],
+  "folders": ["~/.dotfiles", "~/.ssh", "~/.herdr-config"],
   "machines": {
     "worker": {
       "roots": ["~/dev"],
