@@ -1,0 +1,6 @@
+# Written by Herdr / gpui-shell into each mod for editor type checking.
+mods/*/gpui-kit.d.ts
+mods/*/jsconfig.json
+# Claude Code session bookkeeping.
+.claude/
+**/.claude/
