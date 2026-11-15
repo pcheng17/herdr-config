@@ -13,6 +13,12 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_HOME="${HERDR_APP_HOME:-$HOME/.config/herdr-app}"
 BACKUP_DIR="$APP_HOME/.herdr-config-backup/$(date +%Y%m%d-%H%M%S)-$$"
 
+# Same tags and colors as ~/.dotfiles/helper/log.sh.
+log_ok() { printf "\033[32m[OK]\033[0m   %s\n" "$1"; }
+log_info() { printf "\033[34m[INFO]\033[0m %s\n" "$1"; }
+log_warn() { printf "\033[33m[WARN]\033[0m %s\n" "$1"; }
+log_error() { printf "\033[31m[ERROR]\033[0m %s\n" "$1" >&2; }
+
 link() {
   local target=$1 link=$2
   mkdir -p "$(dirname "$link")"
@@ -23,19 +29,22 @@ link() {
     mkdir -p "$(dirname "$backup")"
     mv -n "$link" "$backup"
     if [ -e "$link" ]; then
-      echo "not linked, could not move aside: $link" >&2
+      log_error "Could not move aside, not linked: $link"
       return 1
     fi
-    echo "moved aside: $link -> $backup"
+    log_warn "Moved aside $link -> $backup"
   fi
   ln -s "$target" "$link"
-  echo "linked: $link -> $target"
+  log_ok "Symlink $link -> $target"
 }
+
+log_info "Symlinking Herdr app configs into $APP_HOME..."
 
 for file in keys.json settings.json; do
   link "$REPO/$file" "$APP_HOME/$file"
 done
 
+log_info "Symlinking themes and layouts..."
 for dir in themes layouts; do
   for file in "$REPO/$dir"/*.json; do
     [ -e "$file" ] || continue
@@ -43,6 +52,7 @@ for dir in themes layouts; do
   done
 done
 
+log_info "Symlinking mods..."
 for mod in "$REPO"/mods/*/; do
   [ -d "$mod" ] || continue
   mod="${mod%/}"
