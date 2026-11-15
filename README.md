@@ -16,6 +16,7 @@ after adding a theme, layout or mod. Then pick the layout with
 | Path | What |
 |---|---|
 | `keys.json`, `settings.json` | Key bindings and app settings |
+| `sessionizer.json` | Where the sessionizer looks: `roots` (each one's subfolders) and fixed `folders` |
 | `themes/` | Catppuccin mocha and latte |
 | `layouts/main-inbox.json` | Herdr's `main` layout plus the Inbox panel and tab bar button |
 | `mods/inbox` | Inbox of agents that need you (blocked or finished), with a sources seam for more connections |

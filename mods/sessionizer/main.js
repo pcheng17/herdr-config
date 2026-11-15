@@ -1,8 +1,8 @@
-// tmux-sessionizer for Herdr: a popup listing folders from preset places
-// (folders.js). Type to filter with fzf's matching (match.js), ↑/↓ (or
-// ctrl-n/ctrl-p) and Enter to pick, Esc to leave. Picking a folder that
-// already has a space on this computer shows that space; otherwise it makes a
-// space there, named after it.
+// tmux-sessionizer for Herdr: a popup listing folders from the places in
+// sessionizer.json (read by folders.js). Type to filter with fzf's matching
+// (match.js), ↑/↓ (or ctrl-n/ctrl-p) and Enter to pick, Esc to leave. Picking
+// a folder that already has a space on this computer shows that space;
+// otherwise it makes a space there, named after it.
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";

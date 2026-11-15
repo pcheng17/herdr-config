@@ -1,0 +1,12 @@
+{
+  "roots": [
+    "~/dev",
+    "~/Workspace",
+    "~/work",
+    "~/git",
+    "~/git/roblox",
+    "~/git/roblox/game-engine",
+    "~/git/roblox/game-engine/master/.claude/worktrees"
+  ],
+  "folders": ["~/.dotfiles", "~/.dotclaude", "~/.ssh"]
+}
