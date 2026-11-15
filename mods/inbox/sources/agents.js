@@ -26,4 +26,4 @@ function items() {
     }));
 }
 
-export default { id: "agents", items };
+export default { id: "agents", label: "Agents", items };
