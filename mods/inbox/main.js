@@ -12,7 +12,7 @@ export default class Inbox extends View {
     this.part = props()?.part === "tabs" ? new TabBar(cx) : new Panel(cx);
   }
 
-  render() {
-    return this.part.render();
+  render(cx) {
+    return this.part.render(cx);
   }
 }

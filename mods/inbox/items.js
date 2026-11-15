@@ -19,6 +19,18 @@ function sourceItems(source) {
   }
 }
 
+// Lets sources start background work (reads, fetches) with a view's cx.
+// Called from the tab bar's render, which is always shown in main-inbox.
+export function syncSources(cx) {
+  for (const source of SOURCES) {
+    try {
+      source.sync?.(cx);
+    } catch {
+      // Its items() still run; a source that can't sync shows what it has.
+    }
+  }
+}
+
 export function allItems() {
   return SOURCES.flatMap((source) => sourceItems(source).map((item) => ({ ...item, source: source.id })));
 }

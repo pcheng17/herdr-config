@@ -4,7 +4,7 @@
 import { div, svg, image } from "gpui-kit";
 import { h_flex, ScrollHandle } from "gpui-base";
 import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings, nextCommand } from "herdr";
-import { allItems } from "./items.js";
+import { allItems, syncSources } from "./items.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -62,7 +62,8 @@ export class TabBar {
     localStorage.setItem("panels", JSON.stringify(this.panels));
   }
 
-  render() {
+  render(cx) {
+    syncSources(cx);
     const t = theme();
     const space = spaces().find(p => p.active);
     const shown = space?.tabs ?? [];
