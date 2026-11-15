@@ -14,7 +14,7 @@ const BINDINGS = [
   { key: "c", label: "New tab", act: () => run("tab.new", {}) },
   { key: "b", label: "Toggle sidebar", act: () => run("layout.toggle", { id: "sidebar" }) },
   { key: "s", label: "Go to space", act: () => run("mod.open", { name: "picker" }) },
-  { key: "ctrl-f", label: "Go to space", act: () => run("mod.open", { name: "picker" }) },
+  { key: "ctrl-f", label: "Sessionizer", act: () => run("mod.open", { name: "sessionizer" }) },
   { key: "ctrl-n", label: "New space", act: () => openOverlay({ mod: "prompt", kind: "dialog", width: 360, props: { title: "New space", command: { name: "space.new" } } }) },
   { key: "ctrl-space", label: "Send ctrl-space", act: (terminal) => terminal && hc(["keys", terminal, "ctrl+space"]) },
 ];

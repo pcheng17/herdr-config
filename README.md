@@ -20,6 +20,7 @@ after adding a theme, layout or mod. Then pick the layout with
 | `layouts/main-inbox.json` | Herdr's `main` layout plus the Inbox panel and tab bar button |
 | `mods/inbox` | Inbox of agents that need you (blocked or finished), with a sources seam for more connections |
 | `mods/leader` | tmux-style ctrl-space prefix popup |
+| `mods/sessionizer` | ctrl-space ctrl-f: tmux-sessionizer, fuzzy-pick a folder and open (or switch to) its space |
 | `mods/nvim-tab` | cmd-e: nvim in a new tab at the space's folder |
 
 Herdr doesn't reload a symlinked mod when git changes its files. Switch layouts
