@@ -22,7 +22,8 @@ after adding a theme, layout or mod. Then pick the layout with
 | `mods/inbox` | Inbox of agents that need you (blocked or finished), with a sources seam for more connections |
 | `mods/leader` | tmux-style ctrl-space prefix popup |
 | `mods/sessionizer` | ctrl-space ctrl-f: tmux-sessionizer, fuzzy-pick a folder and open (or switch to) its space; Tab or `@name` narrows to one machine |
-| `mods/nvim-tab` | cmd-e: nvim in a new tab at the space's folder |
+| `mods/nvim-tab` | ctrl-space e: nvim in a new tab at the space's folder |
+| `mods/lazygit-tab` | ctrl-space g: lazygit in a new tab at the space's folder |
 
 Herdr doesn't reload a symlinked mod when git changes its files. Switch layouts
 away and back to load the new code.
