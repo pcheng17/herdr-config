@@ -1,9 +1,11 @@
 // tmux-sessionizer for Herdr: a popup listing folders from the places in
 // sessionizer.json (config.js), on this computer and on other machines
 // (folders.js). Type to filter with fzf's matching (match.js), ↑/↓ (or
-// ctrl-n/ctrl-p) and Enter to pick, Esc to leave. Picking a folder that
-// already has a space on its machine shows that space; otherwise it makes a
-// space there, on that machine, named after the folder.
+// ctrl-n/ctrl-p) and Enter to pick, Esc to leave. Tab (shift-Tab back) steps
+// the machine shown: all, this computer ("local"), then each machine. A query
+// term @name shows only machines whose name starts with name, overriding Tab.
+// Picking a folder that already has a space on its machine shows that space;
+// otherwise it makes a space there, on that machine, named after the folder.
 //
 // This computer's folders show as soon as they're listed; each machine's join
 // when it answers. A machine that can't be reached gets a note, not an error.
@@ -17,6 +19,17 @@ import { matcher } from "./match.js";
 
 const ROW_HEIGHT = 30;
 const VISIBLE_ROWS = 12;
+const LOCAL = "local"; // this computer's name for Tab and @
+
+const machineName = (machine) => machine ?? LOCAL;
+
+// Tab is handled before on_key_down sees it, so it's bound to actions in the
+// popup's own key context instead. The keymap is the app's: bind once.
+let tabBound = false;
+const TAB_BINDINGS = [
+  { keystroke: "tab", action: "sessionizer.next_machine", context: "Sessionizer" },
+  { keystroke: "shift-tab", action: "sessionizer.previous_machine", context: "Sessionizer" },
+];
 
 const basename = (path) => path.slice(path.lastIndexOf("/") + 1) || path;
 const parentOf = (path) => path.slice(0, path.length - basename(path).length);
@@ -33,9 +46,10 @@ export default class Sessionizer extends View {
     this.notes = []; // other machines that couldn't be listed
     this.loading = true;
     this.query = "";
+    this.scope = -1; // index into places of the machine Tab shows, -1 for all
     this.at = 0;
     this.top = 0;
-    this.input = InputState.new({ placeholder: "Open a folder as a space…" });
+    this.input = InputState.new({ placeholder: "Open a folder as a space… (Tab or @ picks a machine)" });
     this.input.on("change", (_e, cx) => {
       this.query = this.input.value().trim();
       this.refilter();
@@ -43,6 +57,7 @@ export default class Sessionizer extends View {
     });
     this.input.on("submit", () => this.go(this.found[this.at]));
     this.input.focus();
+    if (!tabBound) tabBound = cx.bind_keys(TAB_BINDINGS) > 0;
     // The popup can take focus back while it opens, as in the shipped picker.
     cx.timer.after(600, () => this.input.focus());
     cx.spawn(async (cx) => this.load(cx));
@@ -85,7 +100,16 @@ export default class Sessionizer extends View {
   // arrived), the highlighted folder stays highlighted if it still matches.
   refilter({ keepSelection = false } = {}) {
     const selected = this.found[this.at];
-    this.found = this.match(this.query);
+    const terms = this.query.split(/\s+/);
+    const at = terms.find((w) => w.length > 1 && w.startsWith("@"))?.slice(1).toLowerCase();
+    this.byName = Boolean(at); // the chip hides while @ picks instead
+    const scoped = this.places[this.scope];
+    const shows = at
+      ? (f) => machineName(f.machine).toLowerCase().startsWith(at)
+      : scoped
+        ? (f) => f.machine === scoped.machine
+        : () => true;
+    this.found = this.match(terms.filter((w) => !w.startsWith("@")).join(" ")).filter(shows);
     const kept = keepSelection ? this.found.findIndex((f) => sameFolder(f, selected)) : -1;
     if (kept < 0) {
       this.at = 0;
@@ -115,6 +139,14 @@ export default class Sessionizer extends View {
     this.at = (this.at + by + count) % count;
     if (this.at < this.top) this.top = this.at;
     if (this.at >= this.top + VISIBLE_ROWS) this.top = this.at - VISIBLE_ROWS + 1;
+  }
+
+  // Steps the machine Tab shows through all of them, then each place.
+  cycleScope(by, cx) {
+    const n = this.places.length + 1;
+    this.scope = ((((this.scope + 1 + by) % n) + n) % n) - 1;
+    this.refilter();
+    cx.notify();
   }
 
   key(e, cx, count) {
@@ -173,9 +205,15 @@ export default class Sessionizer extends View {
       .gap(8)
       .bg(t.popover)
       .text_size(13)
+      .key_context("Sessionizer")
+      .on_action("sessionizer.next_machine", (_e, cx) => this.cycleScope(1, cx))
+      .on_action("sessionizer.previous_machine", (_e, cx) => this.cycleScope(-1, cx))
       .on_key_down((e, cx) => this.key(e, cx, found.length))
       .child(
-        h_flex().h(36).flex_none().px(10).items_center().rounded(9).border_1().border_color(t.accent).bg(t.background)
+        h_flex().h(36).flex_none().px(10).gap(8).items_center().rounded(9).border_1().border_color(t.accent).bg(t.background)
+          .when(this.scope >= 0 && !this.byName, (el) =>
+            el.child(div().flex_none().px(6).rounded(5).bg(t.hover).text_size(11).text_color(t.accent)
+              .child(machineName(this.places[this.scope]?.machine))))
           .child(Input.new(this.input).flex_1().h_full().text_size(12.8).text_color(t.foreground)),
       )
       .child(
