@@ -21,10 +21,9 @@ const BINDINGS = [
   { key: "ctrl-space", label: "Send ctrl-space", act: (terminal) => terminal && hc(["keys", terminal, "ctrl+space"]) },
 ];
 
-// Opens confirm-yn (the shipped confirm dialog plus y/n): Enter or y runs
-// the command, Esc or n cancels.
+// Opens the shipped confirm dialog: Enter runs the command, Esc cancels.
 const confirm = (title, name, args) =>
-  openOverlay({ mod: "confirm-yn", kind: "dialog", width: 360, height: 150, props: { title, command: { name, args } } });
+  openOverlay({ mod: "confirm", kind: "dialog", width: 360, height: 150, props: { title, command: { name, args } } });
 
 const matches = (b, k) => (b.keys ?? [b.key]).includes(k);
 
