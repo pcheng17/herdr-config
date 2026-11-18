@@ -1,5 +1,7 @@
 // Herdr's shipped `tabs` mod, cloned to add an Inbox button (with a count of
-// open items) beside Files and Changes. `inbox.toggle` (keys.json) toggles it.
+// open items) beside Files and Changes, and a PRs button that flips the main
+// area to the PRs dashboard (the layout's main-stack), with its Needs me
+// count. `inbox.toggle` (keys.json) toggles the Inbox.
 
 import { div, svg, image } from "gpui-kit";
 import { h_flex, ScrollHandle } from "gpui-base";
@@ -20,6 +22,13 @@ function togglePanel(id) {
   if (panel && !panel.hidden && body?.active === id) run("layout.hide", { id: "panel" });
   else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
 }
+
+const prsShown = () => find(layout(), "main-stack")?.active === "prs";
+const showMain = () => {
+  run("layout.select", { stack: "main-stack", child: "main" });
+  const pane = panes().find(p => p.focused)?.pane;
+  if (pane) run("pane.focus", { pane });
+};
 
 export class TabBar {
   constructor(cx) {
@@ -77,19 +86,20 @@ export class TabBar {
     const stop = (_e, cx) => cx.stop_propagation();
     const button = (id, label, action) => div().id(id).size(26).flex_none().flex().items_center().justify_center().rounded(6).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
       .on_mouse_down("left", stop).on_click(action).child(label);
+    const onPrs = prsShown();
     const item = (c, i) => {
       const program = panes().find(p => p.tab === c.id && p.program?.agent)?.program ?? panes().find(p => p.tab === c.id)?.program;
       const name = /^tb\d+$/.test(c.name) ? program?.name ?? "Terminal" : c.name;
       return h_flex().id(`tab-${c.id}`).h(29).px(10).gap(7).rounded(7).items_center().flex_none().text_size(12.8)
         // A rename or status dot on this or an earlier tab can push the active one out.
         .when(i <= active, el => el.on_size_change((_size, cx) => { this.scroll.scroll_to_item(active); cx.notify(); }))
-        .border(1).border_color(c.active ? t.border : t.chrome).bg(c.active ? t.raised : t.chrome).text_color(c.active ? t.foreground : t.muted)
+        .border(1).border_color(c.active && !onPrs ? t.border : t.chrome).bg(c.active && !onPrs ? t.raised : t.chrome).text_color(c.active && !onPrs ? t.foreground : t.muted)
         .hover(s => s.bg(t.hover))
         .on_mouse_down("left", (e, cx) => { cx.stop_propagation(); this.pressed = i; if (e.click_count === 2) run("tab.rename", { id: c.id }); })
         .on_mouse_up("left", () => {
           const from = this.pressed; this.pressed = null;
           if (from !== null && from !== i) run("tab.move", { id: shown[from].id, index: space.tabs.findIndex(x => x.id === c.id) + 1 });
-          else run("tab.select", { id: c.id });
+          else { run("tab.select", { id: c.id }); if (onPrs) showMain(); }
         })
         .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "menu", kind: "popup", width: 200, props: { tab: "tab", target: { id: c.id, space: space.id } } }); })
         .when(Boolean(program?.icon), el => el.child(program.tint ? svg(program.icon).size(14).text_color(t.muted) : image(program.icon).size(14)))
@@ -107,6 +117,7 @@ export class TabBar {
     const enabled = ["inbox", ...(shared("workspace.panels") ?? ["files", "changes"])];
     this.syncPanel(space, panel, body, enabled);
     const count = allItems().length;
+    const needs = shared("prs.needs") ?? 0;
     const panelButton = (id, label, icon) => {
       const on = panel && !panel.hidden && body?.active === id;
       return h_flex().id(`panel-${id}`).h(26).px(8).gap(5).flex_none().items_center().rounded(6)
@@ -123,6 +134,12 @@ export class TabBar {
         .on_size_change((_size, cx) => { if (active >= 0) { this.scroll.scroll_to_item(active); cx.notify(); } })
         .children(shown.map(item)))
       .child(button("tab-new", "+", () => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })))
+      .child(h_flex().id("prs-button").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
+        .text_size(12).bg(onPrs ? t.selected : t.chrome).text_color(onPrs ? t.foreground : t.muted)
+        .hover(s => s.bg(t.hover)).on_mouse_down("left", stop)
+        .on_click(() => onPrs ? showMain() : run("layout.select", { stack: "main-stack", child: "prs" }))
+        .child(svg("mods/inbox/prs.svg").size(14)).child("PRs")
+        .when(needs > 0, el => el.child(div().text_size(11).font_semibold().text_color(t.blocked).child(String(needs)))))
       .child(panelButton("inbox", "Inbox", "mods/inbox/inbox.svg"))
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))

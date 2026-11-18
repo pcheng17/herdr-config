@@ -3,7 +3,7 @@
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { run, hc, props, focused, openOverlay, closeOverlay, nextCommand, theme } from "herdr";
+import { run, hc, props, focused, layout, openOverlay, closeOverlay, nextCommand, theme } from "herdr";
 
 // Matched against the event's keystroke, else the character it types.
 // `keys` lets one row cover several keys; the pressed key is passed to `act`.
@@ -16,6 +16,7 @@ const BINDINGS = [
   { key: "s", label: "Go to space", act: () => run("mod.open", { name: "picker" }) },
   { key: "e", label: "Nvim tab", act: () => run("mod.open", { name: "nvim-tab" }) },
   { key: "g", label: "Lazygit tab", act: () => run("mod.open", { name: "lazygit-tab" }) },
+  { key: "p", label: "PRs dashboard", act: (_t, _k, pane) => togglePrs(pane) },
   { key: "ctrl-f", label: "Sessionizer", act: () => run("mod.open", { name: "sessionizer" }) },
   { key: "ctrl-n", label: "New space", act: () => openOverlay({ mod: "prompt", kind: "dialog", width: 360, props: { title: "New space", command: { name: "space.new" } } }) },
   { key: "ctrl-space", label: "Send ctrl-space", act: (terminal) => terminal && hc(["keys", terminal, "ctrl+space"]) },
@@ -24,6 +25,25 @@ const BINDINGS = [
 // Opens the shipped confirm dialog: Enter runs the command, Esc cancels.
 const confirm = (title, name, args) =>
   openOverlay({ mod: "confirm", kind: "dialog", width: 360, height: 150, props: { title, command: { name, args } } });
+
+const find = (node, id) => {
+  if (!node || typeof node !== "object") return null;
+  if (node.id === id) return node;
+  for (const child of node.children ?? []) {
+    const found = find(child, id);
+    if (found) return found;
+  }
+  return null;
+};
+
+// Flips the layout's main area between the shown tab and the PRs dashboard
+// (layouts/pcheng.json's main-stack). Back to the tab, `pane` (the one focused
+// when the leader opened) gets the keyboard again.
+const togglePrs = (pane) => {
+  if (find(layout(), "main-stack")?.active !== "prs") return run("layout.select", { stack: "main-stack", child: "prs" });
+  run("layout.select", { stack: "main-stack", child: "main" });
+  if (pane) run("pane.focus", { pane });
+};
 
 const matches = (b, k) => (b.keys ?? [b.key]).includes(k);
 

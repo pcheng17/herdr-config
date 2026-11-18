@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Symlinks this repo's Herdr app config into ~/.config/herdr-app (or
-# $HERDR_APP_HOME): keys.json, settings.json, sessionizer.json, each theme and
-# layout file, and each mod folder. Only these are linked; Herdr's shipped
+# $HERDR_APP_HOME): keys.json, settings.json, sessionizer.json, prs.json,
+# each theme and layout file, and each mod folder. Only these are linked; Herdr's shipped
 # files and its own state stay where they are. Safe to rerun: existing links
 # are replaced, and a real file or folder in the way is moved into a per-run
 # backup folder, $APP_HOME/.herdr-config-backup/<time>-<pid>/ (outside mods/,
@@ -48,7 +48,7 @@ link() {
 
 log_info "Symlinking Herdr app configs into $(pretty "$APP_HOME")..."
 
-for file in keys.json settings.json sessionizer.json; do
+for file in keys.json settings.json sessionizer.json prs.json; do
   link "$REPO/$file" "$APP_HOME/$file"
 done
 
