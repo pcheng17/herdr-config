@@ -1,6 +1,6 @@
-// Headless: opening this mod (keys.json) starts lazygit in a new tab at the
-// focused space's folder, then closes itself. `exec` replaces the tab's shell
-// with lazygit, so q closes the tab.
+// Headless: opening this mod (the leader's g) starts lazygit in a new tab at
+// the focused space's folder, then closes itself. `exec` replaces the tab's
+// shell with lazygit, so q closes the tab.
 
 import { View, div } from "gpui-kit";
 import { run, props, focused, spaces, closeOverlay } from "herdr";

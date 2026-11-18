@@ -1,4 +1,4 @@
-// Headless: opening this mod (keys.json) starts nvim in a new tab at the
+// Headless: opening this mod (the leader's e) starts nvim in a new tab at the
 // focused space's folder, then closes itself. `exec` replaces the tab's shell
 // with nvim, so :q closes the tab.
 
