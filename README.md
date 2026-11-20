@@ -25,6 +25,7 @@ after adding a theme, layout or mod. Then pick the layout with
 | [`mods/sessionizer`](mods/sessionizer/README.md) | ctrl-space ctrl-f: tmux-sessionizer, fuzzy-pick a folder and open (or switch to) its space |
 | [`mods/nvim-tab`](mods/nvim-tab/README.md) | ctrl-space e: nvim in a new tab at the space's folder |
 | [`mods/lazygit-tab`](mods/lazygit-tab/README.md) | ctrl-space g: lazygit in a new tab at the space's folder |
+| [`mods/smart-close`](mods/smart-close/README.md) | cmd-w: confirm, then close the pane if the tab has several, else the tab |
 | [`mods/prs`](mods/prs/README.md) | ctrl-space p: a dashboard of your PRs (Needs me, mine, review requested, involved, merged) in place of the tabs, with filter chips and search |
 
 Herdr doesn't reload a symlinked mod when git changes its files. Switch layouts
