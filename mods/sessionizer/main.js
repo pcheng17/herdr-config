@@ -24,8 +24,8 @@ const LOCAL = "local"; // this computer's name for Tab and @
 const machineName = (machine) => machine ?? LOCAL;
 
 // Tab is handled before on_key_down sees it, so it's bound to actions in the
-// popup's own key context instead. The keymap is the app's: bind once.
-let tabBound = false;
+// popup's own key context instead. The keymap is the app's, and the app
+// rebuilds it when keys.json changes, so bind on every open.
 const TAB_BINDINGS = [
   { keystroke: "tab", action: "sessionizer.next_machine", context: "Sessionizer" },
   { keystroke: "shift-tab", action: "sessionizer.previous_machine", context: "Sessionizer" },
@@ -57,7 +57,7 @@ export default class Sessionizer extends View {
     });
     this.input.on("submit", () => this.go(this.found[this.at]));
     this.input.focus();
-    if (!tabBound) tabBound = cx.bind_keys(TAB_BINDINGS) > 0;
+    cx.bind_keys(TAB_BINDINGS);
     // The popup can take focus back while it opens, as in the shipped picker.
     cx.timer.after(600, () => this.input.focus());
     cx.spawn(async (cx) => this.load(cx));
