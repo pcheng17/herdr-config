@@ -133,7 +133,7 @@ export class TabBar {
       .child(h_flex().id("tab-scroll").flex_1().min_w(0).h_full().items_center().gap(3).overflow_x_scrollbar().track_scroll(this.scroll)
         .on_size_change((_size, cx) => { if (active >= 0) { this.scroll.scroll_to_item(active); cx.notify(); } })
         .children(shown.map(item)))
-      .child(button("tab-new", "+", () => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })))
+      .child(button("tab-new", "+", () => openOverlay({ mod: "new-menu-end", kind: "popup", width: 250, height: 512 })))
       .child(h_flex().id("prs-button").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
         .text_size(12).bg(onPrs ? t.selected : t.chrome).text_color(onPrs ? t.foreground : t.muted)
         .hover(s => s.bg(t.hover)).on_mouse_down("left", stop)
